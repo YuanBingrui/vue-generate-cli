@@ -23,6 +23,8 @@ $ vue-g g <dirname> <filename>
 or
 // generate more new files in custom directory
 $ vue-g g <dirname> <filename01> <filename02> <filename03> <filename(2N+1)>
+// generate more new files in custom path
+$ vue-g g path <filename01> <filename02> <filename03> <filename(2N+1)>
 ```
 
 Example:
@@ -33,4 +35,6 @@ or
 $ vue-g g libs my-component
 or
 $ vue-g g libs my-component01 my-component02 my-component03
+or
+$ vue-g g ./components/libs my-component01 my-component02 my-component03
 ```
