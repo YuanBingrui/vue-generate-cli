@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+const chalk = require('chalk');
+const ora = require('ora');
+const spinnerstyle = require('../libs/spinners.json');
+const path = require('path');
+const fs = require('fs');
+
+const spinner = ora({
+  text: chalk.blue('generate template begin'),
+  spinner: spinnerstyle.dots
+});
+
+program.on('--help', function() {
+  console.log('  Examples:');
+  console.log('');
+  console.log('    $ vue-generate --help');
+  console.log('    $ vue-generate -h');
+  console.log('');
+  console.log(chalk.gray('    # create a new example.vue file with an template in components directory'));
+  console.log('    $ vue-generate example');
+  console.log(chalk.gray('    # create a new example.vue file with an template in libs directory'));
+  console.log('    $ vue-generate libs example');
+  console.log(chalk.gray('    # create more new example01.vue, example02.vue and example03.vue files with an template in libs directory'));
+  console.log('    $ vue-generate libs example01 example02 example03');
+  console.log('');
+});
+
+program.parse(process.argv);
+
+/**
+ * Help
+ */
+(function help () {
+  if (program.args.length < 1) return program.help();
+})()
+
+/**
+ * Generate
+ */
+let status = true;
+const suffix = '.vue';
+const baseDir = './src';
+const basePath = path.join(process.cwd(), baseDir);
+
+console.log('');
+spinner.start('Generating, please wait......');
+console.log('');
+console.log('');
+
+checkBasePathIsexists(basePath, baseDir);
+
+// check basepath
+function checkBasePathIsexists(currentPath, currentDir) {
+  if (fs.existsSync(currentPath)) {
+    generate();
+  } else {
+    spinner.fail(chalk.red(currentDir + ' directory does not exist'));
+  }
+}
+
+// check path
+function checkPathIsexists(currentDir, filename) {
+  let currentPath = path.join(basePath, currentDir);
+  if(fs.existsSync(currentPath)) {
+    checkVueFileIsexists(currentPath, filename);
+  } else {
+    fs.mkdirSync(currentPath);
+    checkVueFileIsexists(currentPath, filename);
+  }
+}
+
+function checkVueFileIsexists(currentPath, filename) {
+  if(Object.prototype.toString.call(filename) === '[object Array]') {
+    filename.forEach(function(onefile) {
+      onefile = onefile.replace(/([A-Z])/g,"-$1").toLowerCase();
+      let file = path.join(currentPath, './' + onefile);
+      generateVueFile(file, onefile);
+    })
+  } else {
+    filename = filename.replace(/([A-Z])/g,"-$1").toLowerCase();
+    let file = path.join(currentPath, './' + filename);
+    generateVueFile(file, filename);
+  }
+}
+
+function generateVueFile(file, filename) {
+  if(fs.existsSync(file + suffix)) {
+    status = false;
+    console.log(chalk.yellow(filename + suffix + ' exists.'));
+  } else {
+    fs.writeFileSync(file + suffix, generateTemplate(filename));
+  }
+}
+
+function generate() {
+  if (program.args.length === 1) {
+    checkPathIsexists('./components', program.args[0]);
+  } else if(program.args.length === 2) {
+    checkPathIsexists(program.args[0], program.args[1]);
+  } else {
+    checkPathIsexists(program.args.shift(), program.args);
+  }
+  console.log('');
+  if(status) {
+    spinner.succeed('Generated successfully');
+  }
+  spinner.stop();
+}
+
+function generateTemplate(filename) {
+  return `<template>\n  <div class="${filename}"></div>\n</template>\n\n`
+                    + `<script>\nexport default {\n  name: '${filename}',\n  data () {\n    return {\n\n    }\n  },\n  created () {},\n  mounted () {},\n  methods: {}\n}\n</script>\n\n`
+                    + `<style scoped>\n.${filename} {\n\n}\n</style>\n`;
+}
