@@ -1,10 +1,14 @@
 {
   "name": "vue-generate-cli",
   "version": "1.0.0",
-  "description": "A cli tool for autogenerating vue template component",
+  "description": "A cli tool for auto-generating vue template component",
   "author": "bingrui_yuan0721@163.com",
   "bin": {
     "vue-g": "bin/vue"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YuanBingrui/vue-generate-cli.git"
   },
   "keywords": [
     "vue",
