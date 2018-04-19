@@ -1,0 +1,24 @@
+{
+  "name": "vue-generate-cli",
+  "version": "1.0.0",
+  "description": "A cli tool for autogenerating vue template component",
+  "author": "bingrui_yuan0721@163.com",
+  "bin": {
+    "vue-g": "bin/vue"
+  },
+  "keywords": [
+    "vue",
+    "cli",
+    "generate",
+    "vue-generate-cli"
+  ],
+  "dependencies": {
+    "chalk": "^2.4.0",
+    "commander": "^2.15.1",
+    "ora": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "license": "MIT"
+}
