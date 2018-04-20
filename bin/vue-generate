@@ -45,7 +45,6 @@ program.parse(process.argv);
 /**
  * Generate
  */
-console.log(program.PascalCase);
 const suffix = '.vue';
 const baseDir = './src';
 const basePath = path.join(process.cwd(), baseDir);
@@ -141,9 +140,13 @@ function generate() {
 }
 
 function generateTemplate(filename) {
-  return  `<template>\n  <div class="${generateClassName(filename)}"></div>\n</template>\n\n`
+  return  program.CSS ? `<template>\n  <div class="${generateClassName(filename)}"></div>\n</template>\n\n`
+          + `<script>\nexport default {\n  name: '${filename}',\n  data () {\n    return {\n\n    }\n  },\n  created () {},\n  mounted () {},\n  methods: {}\n}\n</script>\n\n`
+          + `<style scoped>\n  @import "./${filename}.css";\n</style>\n` : 
+          `<template>\n  <div class="${generateClassName(filename)}"></div>\n</template>\n\n`
           + `<script>\nexport default {\n  name: '${filename}',\n  data () {\n    return {\n\n    }\n  },\n  created () {},\n  mounted () {},\n  methods: {}\n}\n</script>\n\n`
           + `<style scoped>\n.${generateClassName(filename)} {\n\n}\n</style>\n`;
+          
 }
 
 function generateCssTemplate(filename) {
