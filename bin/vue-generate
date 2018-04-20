@@ -7,6 +7,10 @@ const spinnerstyle = require('../libs/spinners.json');
 const path = require('path');
 const fs = require('fs');
 
+program
+  .option('-C, --CSS', 'Add CSS file')
+  .option('-P, --PascalCase', 'Add PascalCase')
+
 const spinner = ora({
   text: chalk.blue('generate template begin'),
   spinner: spinnerstyle.dots
@@ -41,7 +45,7 @@ program.parse(process.argv);
 /**
  * Generate
  */
-let status = true;
+console.log(program.PascalCase);
 const suffix = '.vue';
 const baseDir = './src';
 const basePath = path.join(process.cwd(), baseDir);
@@ -67,7 +71,6 @@ function checkPathIsexists(currentDir, filename) {
   if(fs.existsSync(currentPath)) {
     checkVueFileIsexists(currentPath, filename);
   } else {
-    console.log(currentPath);
     fs.mkdirSync(currentPath);
     checkVueFileIsexists(currentPath, filename);
   }
@@ -76,25 +79,52 @@ function checkPathIsexists(currentDir, filename) {
 function checkVueFileIsexists(currentPath, filename) {
   if(Object.prototype.toString.call(filename) === '[object Array]') {
     filename.forEach(function(onefile) {
-      onefile = onefile.replace(/([A-Z])/g,"-$1").toLowerCase();
+      onefile = variableNameConversion(onefile);
       let file = path.join(currentPath, './' + onefile);
       generateVueFile(file, onefile);
     })
   } else {
-    filename = filename.replace(/([A-Z])/g,"-$1").toLowerCase();
+    filename = variableNameConversion(filename);
     let file = path.join(currentPath, './' + filename);
     generateVueFile(file, filename);
   }
 }
 
+function variableNameConversion(filename) {
+  if(program.PascalCase) {
+    filename = filename.replace(/\-(\w)/g, function(all, letter){
+                return letter.toUpperCase();
+              });
+    filename = filename.substring(0, 1).toUpperCase() + filename.substring(1);
+  } else {
+    filename = filename.substring(0, 1).toLowerCase() + filename.substring(1);
+    filename = filename.replace(/([A-Z])/g,"-$1").toLowerCase();
+  }
+  return filename;
+}
+
+function generateClassName(filename) {
+  filename = filename.substring(0, 1).toLowerCase() + filename.substring(1);
+  return filename = filename.replace(/([A-Z])/g,"-$1").toLowerCase();
+}
+
 function generateVueFile(file, filename) {
   console.log('');
-  spinner.start(filename + suffix + ' is generating......');
-  if(fs.existsSync(file + suffix)) {
-    spinner.fail(chalk.red(filename + suffix + ' exists.'));
+  let currentPath = program.CSS ? (path.join(file, './' + filename)) : (file + suffix);
+  let currentDir = program.CSS ? file : (file + suffix);
+  let showFileName = program.CSS ? filename : filename + suffix;
+  spinner.start(showFileName + ' is generating......');
+  if(fs.existsSync(currentDir)) {
+    spinner.fail(chalk.red(showFileName + ' exists.'));
   } else {
-    fs.writeFileSync(file + suffix, generateTemplate(filename));
-    spinner.succeed(filename + suffix + ' generated successfully');
+    if(program.CSS) {
+      fs.mkdirSync(file);
+      fs.writeFileSync(currentPath + suffix, generateTemplate(filename));
+      fs.writeFileSync(currentPath + '.css', generateCssTemplate(filename));
+    } else {
+      fs.writeFileSync(currentPath, generateTemplate(filename));
+    }
+    spinner.succeed(showFileName + ' generated successfully');
   }
 }
 
@@ -111,7 +141,11 @@ function generate() {
 }
 
 function generateTemplate(filename) {
-  return `<template>\n  <div class="${filename}"></div>\n</template>\n\n`
+  return  `<template>\n  <div class="${generateClassName(filename)}"></div>\n</template>\n\n`
           + `<script>\nexport default {\n  name: '${filename}',\n  data () {\n    return {\n\n    }\n  },\n  created () {},\n  mounted () {},\n  methods: {}\n}\n</script>\n\n`
-          + `<style scoped>\n.${filename} {\n\n}\n</style>\n`;
+          + `<style scoped>\n.${generateClassName(filename)} {\n\n}\n</style>\n`;
+}
+
+function generateCssTemplate(filename) {
+  return  `.${generateClassName(filename)} {\n\n}`;
 }
