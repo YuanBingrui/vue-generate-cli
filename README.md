@@ -23,8 +23,14 @@ $ vue-g g <dirname> <filename>
 or
 // generate more new files in custom directory
 $ vue-g g <dirname> <filename01> <filename02> <filename03> <filename(2N+1)>
+or
 // generate more new files in custom path
 $ vue-g g path <filename01> <filename02> <filename03> <filename(2N+1)>
+or
+// generate a new files in custom path with -P and -C option
+$ vue-g g path <filename01> <filename02> <filename03> -P -C
+// -P filename is PascalCase format
+// -C generate CSS file
 ```
 
 Example:
