@@ -10,6 +10,8 @@ const fs = require('fs');
 program
   .option('-C, --CSS', 'Add CSS file')
   .option('-P, --PascalCase', 'Add PascalCase')
+  .option('-R, --RootDir [CustomRootDir]', 'Set CustomRootDir')
+  .option('-r, --CurrentRootDir', 'Set CustomCurrentRootDir')
 
 const spinner = ora({
   text: chalk.blue('generate template begin'),
@@ -46,8 +48,10 @@ program.parse(process.argv);
  * Generate
  */
 const suffix = '.vue';
-const baseDir = './src';
+const baseDir = program.RootDir ? (program.RootDir === true ? './src' : `./${program.RootDir}`) : './src';
 const basePath = path.join(process.cwd(), baseDir);
+
+(program.RootDir && (program.RootDir !== true)) && !fs.existsSync(basePath) && fs.mkdirSync(basePath);
 
 console.log('');
 spinner.start('Generating, please wait......');
@@ -129,7 +133,7 @@ function generateVueFile(file, filename) {
 
 function generate() {
   if (program.args.length === 1) {
-    checkPathIsexists('./components', program.args[0]);
+    checkPathIsexists(program.CurrentRootDir ? './' : './components', program.args[0]);
   } else if(program.args.length === 2) {
     checkPathIsexists(program.args[0], program.args[1]);
   } else {
