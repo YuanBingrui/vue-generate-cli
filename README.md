@@ -15,8 +15,13 @@ $ yarn global add vue-generate-cli
 ### Usage
 
 ``` bash
+// default generate a new file in './src' directory or sub-directory
+// add -R [rootDir] option to generate new file in custome root directory
+$ vue-g g <filename> || vue-g g <filename> -R doc
+or
 // default generate a new file in components directory
-$ vue-g g <filename>
+// add -r option to generate new file in current root directory
+$ vue-g g <filename> || vue-g g <filename> -r
 or
 // generate a new file in custom directory
 $ vue-g g <dirname> <filename>
